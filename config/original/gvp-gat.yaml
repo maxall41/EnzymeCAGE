@@ -1,0 +1,36 @@
+
+gpu: 0
+data_version: 'V10'
+recall_method: 'selenzyme'
+
+model: 'gvp-gat'
+data_split_by: 'reaction'
+data_dir: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V10/'
+# save_dir: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/checkpoints/'
+# ckpt_dir: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/checkpoints/V9/split_by_both/gvp_gat'
+use_esm: True
+use_gvp: False
+use_unimol: False
+use_drfp: True
+use_rxn_gat: False
+
+
+# esm+gat
+# batch_size: 1024
+
+# # esm+gvp+gat
+# batch_size: 256
+
+# # esm+drfp
+batch_size: 512
+
+auto_load_data: False
+
+train_path: '/mnt/nas/ai-algorithm-data/liuyong/dataset/SynBio/enzyme-reaction-pairs/v9/remove_no_ec/with_atom_limits_proevi-1/train.csv'
+valid_path: '/mnt/nas/ai-algorithm-data/liuyong/dataset/SynBio/enzyme-reaction-pairs/v9/remove_no_ec/with_atom_limits_proevi-1/test.csv'
+test_path: '/mnt/nas/ai-algorithm-data/liuyong/dataset/SynBio/enzyme-reaction-pairs/v9/remove_no_ec/with_atom_limits_proevi-1/test.csv'
+ckpt_dir: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/checkpoints/V9/no_ec_rxns/esm_drfp_cross-attn_bn_proevi-1'
+
+
+# column name
+label_column_name: 'Label'

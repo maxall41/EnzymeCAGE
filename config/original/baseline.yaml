@@ -1,0 +1,43 @@
+gpu: 0
+data_version: 'V12'
+recall_method: 'selenzyme'
+
+use_new_transformer: True
+coevolution_attn: False
+add_reaction_msa: True
+add_enzyme_msa: True
+merge_msa: True
+
+rxn_feat: 'drfp'
+# rxn_feat: 'morgan_fp'
+interaction_method: 'no_interaction'
+#rxn_feat: 'drfp'
+model: 'baseline'
+data_split_by: 'all'
+data_dir: ''
+
+num_epochs: 15
+lr_init: 0.0003
+batch_size: 10
+# batch_size: 5
+# batch_size: 5120
+use_gradient_accumulation: True
+
+auto_load_data: False
+
+# train_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v12.3/new-rxns/train.csv'
+# valid_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v12.3/new-rxns/test.csv'
+# test_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v12.3/new-rxns/selenzyme_infer.csv'
+# # ckpt_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/checkpoints/V12.3/new-rxns/baseline/coevo_rxn_enzyme_lr3e-4_grad-accum_fixbug'
+# ckpt_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/checkpoints/V12.3/new-rxns/baseline/morgan'
+
+
+train_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v12.3/new-enzymes/train.csv'
+valid_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v12.3/new-enzymes/test.csv'
+test_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v12.3/new-enzymes/test.csv'
+ckpt_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/checkpoints/V12.3/new-enzymes/baseline/coevo_rxn_enzyme_lr3e-4_grad-accum_new'
+# ckpt_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/checkpoints/V12.3/new-enzymes/baseline/morgan'
+
+
+label_column_name: 'Label'
+

@@ -1,0 +1,92 @@
+frame: 'lightgbm'  # xgboost or lightgbm
+restore_model: False
+boost_round: 2000
+task_type: 'classification' # classification or regression
+early_stopping_round: 100
+
+gpu: 0
+data_version: 'V9'
+recall_method: 'selenzyme'
+
+model: 'gvp-gin'
+# enz_feat_type: 'gvp-gat'
+# enz_feat_type: 'esm-gvp'
+data_split_by: 'toy'
+data_dir: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V9/'
+
+use_esm: True
+use_gvpgin: True
+# use_unimol: True
+use_drfp: True
+# use_rxn_gat: True
+
+batch_size: 100
+
+auto_load_data: False
+
+train_path: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V9/split_both/toy/train.csv'
+valid_path: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V9/split_both/toy/valid.csv'
+test_path: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V9/split_both/toy/test.csv'
+
+# train_path: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/npy_feature/drfp_gearnet/train.csv'
+# valid_path: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/npy_feature/drfp_gearnet/valid.csv'
+# test_path: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/npy_feature/drfp_gearnet/test.csv'
+# train_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/npy_feature/drfp_gearnet/train_feature.npy'
+# valid_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/npy_feature/drfp_gearnet/valid_feature.npy'
+# test_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/npy_feature/drfp_gearnet/test_feature.npy'
+
+# data path
+# ==============================================split by reaction===========================================================
+# data_split_by: 'reaction'
+# train_path: "/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/csv/train.csv"
+# valid_path: "/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/csv/valid.csv"
+# test_path: "/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/csv/test.csv"
+# train_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/npy_feature/drfp_esm2/train_feature.npy'
+# valid_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/npy_feature/drfp_esm2/valid_feature.npy'
+# test_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_reaction/npy_feature/drfp_esm2/test_feature.npy'
+# ==========================================================================================================================
+
+# ==============================================split by enzyme============================================================
+# data_split_by: 'enzyme'
+# train_path: "/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_enzyme/csv/train.csv"
+# valid_path: "/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_enzyme/csv/valid.csv"
+# test_path: "/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_enzyme/csv/test.csv"
+# train_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_enzyme/npy_feature/drfp_esm2/train_feature.npy'
+# valid_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_enzyme/npy_feature/drfp_esm2/valid_feature.npy'
+# test_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_enzyme/npy_feature/drfp_esm2/test_feature.npy'
+# ==========================================================================================================================
+
+
+# ==============================================split by both===============================================================
+# data_split_by: 'both'
+# train_path: "/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_both/csv/train.csv"
+# valid_path: "/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_both/csv/valid.csv"
+# test_path: "/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_both/csv/test.csv"
+# train_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_both/npy_feature/drfp_esm2/train_feature.npy'
+# valid_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_both/npy_feature/drfp_esm2/valid_feature.npy'
+# test_feat: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V5/split_both/npy_feature/drfp_esm2/test_feature.npy'
+# ==========================================================================================================================
+
+
+# column name
+label_column_name: 'Label'
+
+# params for regression model
+params:
+  objective: 'binary'
+  metric: 'auc'
+  seed: 42
+  bagging_seed: 42
+  boosting_type: 'gbdt'
+  num_leaves: 80
+  learning_rate: 0.1
+  feature_fraction: 0.8
+  bagging_fraction: 0.8
+  bagging_freq: 5
+  max_depth: 7
+  max_bin: 200
+  min_data_in_leaf: 100
+  lambda_l1: 0.05
+  lambda_l2: 0.05
+  num_threads: 30
+  verbosity: -1

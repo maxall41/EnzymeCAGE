@@ -1,0 +1,42 @@
+
+gpu: 4
+data_version: 'V9'
+recall_method: 'selenzyme'
+model: 'gvp-gat'
+interaction_method: null
+data_split_by: 'all'
+data_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V9/'
+# save_dir: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/checkpoints/'
+# ckpt_dir: '/mnt/nas/ai-algorithm-data/liuyong/code/SynBio/enzyme-rxn-prediction/checkpoints/V9/split_by_both/gvp_gat'
+
+use_esm: False
+use_gvp: True
+use_unimol: False
+use_drfp: True
+use_rxn_gat: False
+
+
+# esm+gat
+# batch_size: 1024
+
+# # esm+gvp+gat
+# batch_size: 256
+
+# # esm+drfp
+batch_size: 256
+
+auto_load_data: False
+
+# train_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v9/eval_new_enzymes/v3/train.csv'
+# valid_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v9/eval_new_enzymes/v3/test.csv'
+# test_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v9/eval_new_enzymes/v3/test.csv'
+# ckpt_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/checkpoints/V9/eval_new_enzymes/v3/gvp-fp-baseline'
+
+train_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v9/remove_no_ec/with_atom_limits/train.csv'
+valid_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v9/remove_no_ec/with_atom_limits/test.csv'
+test_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v9/remove_no_ec/with_atom_limits/test.csv'
+ckpt_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/checkpoints/V9/no_ec_rxns/gvp-fp-baseline'
+
+
+# column name
+label_column_name: 'Label'

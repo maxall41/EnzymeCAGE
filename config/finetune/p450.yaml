@@ -1,0 +1,43 @@
+data_version: 'V12'
+recall_method: 'selenzyme'
+
+rxn_feat: 'drfp'
+model: 'gvp-schnet'
+
+predict_dis_pair: False
+interaction_method: 'geo-attn_cross-attn'
+pair_repr_type: 'distance_map'
+rxn_inner_interaction: True
+
+msa_feature: False
+merge_msa: False
+freeze_msa_model: False
+do_coevo_attn: False
+
+data_split_by: 'all'
+
+data_dir: '/cluster/home/xiuming.li/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V12/'
+
+use_prods_info: False
+use_structure: True
+use_drfp: True
+use_esm: True
+
+num_epochs: 5
+lr_init: 0.00003
+batch_size: 384
+use_gradient_accumulation: False
+
+label_column_name: 'Label'
+
+auto_load_data: False
+
+seed: 42
+pretrain_model: '/cluster/home/xiuming.li/code/SynBio/enzyme-rxn-prediction/checkpoints/V12.3/new-enzymes/cataformer_super-light-weight/geo-enzyme_cross-attn-rxn-light-weight_mol-3D-schnet/seed_42/best_model.pth'
+train_path: '/cluster/home/xiuming.li/data/SynBio/enzyme-reaction-pairs/training/v12.3/p450_finetune/data.csv'
+valid_path: '/cluster/home/xiuming.li/data/SynBio/enzyme-reaction-pairs/training/v12.3/p450_finetune/test.csv'
+test_path: '/cluster/home/xiuming.li/data/SynBio/enzyme-reaction-pairs/training/v12.3/p450_finetune/test.csv'
+ckpt_dir: '/cluster/home/xiuming.li/code/SynBio/enzyme-rxn-prediction/checkpoints/V12.3/new-enzymes/cataformer_super-light-weight/geo-enzyme_mol-3D-schnet_P450-ft/seed_42'
+
+
+

@@ -1,0 +1,37 @@
+model: 'EnzymeCAGE'
+
+interaction_method: 'geo-enhanced-interaction'
+rxn_inner_interaction: True
+
+use_prods_info: False
+use_structure: True
+use_drfp: True
+use_esm: True
+
+seed: 42
+num_epochs: 10
+lr_init: 0.0003
+batch_size: 32
+use_gradient_accumulation: False
+
+label_column_name: 'Label'
+
+#train_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v12.3/new-rxns/train.csv'
+#valid_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v12.3/new-rxns/test.csv'
+#test_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v12.3/new-rxns/selenzyme_infer.csv'
+#ckpt_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/checkpoints/V12.3/new-rxns/cataformer_no-bias/geo-enzyme_mol-3D-schnet'
+
+train_path: /home/liuy/data/SynBio/enzyme-reaction-pairs/training/toy/test.csv
+valid_path: /home/liuy/data/SynBio/enzyme-reaction-pairs/training/toy/test.csv
+test_path: /home/liuy/data/SynBio/enzyme-reaction-pairs/training/toy/test.csv
+ckpt_dir: /home/liuy/code/SynBio/EnzymeCAGE/checkpoints/toy
+
+pretrain_model: null
+
+### debug feature path 
+rxn_fp: /home/liuy/data/SynBio/enzyme-reaction-pairs/training/toy/feature/reaction/drfp/rxn2fp.pkl
+protein_gvp_feat: /home/liuy/data/SynBio/enzyme-reaction-pairs/training/toy/gvp_protein_feature_toy.pt
+esm_mean_feature: /home/liuy/data/SynBio/enzyme-reaction-pairs/feature/esm2_t33_650M_UR50D/protein_level/seq2feature.pkl
+esm_node_feature: /home/liuy/data/SynBio/enzyme-reaction-pairs/training/toy/esm_node_feature.pt
+mol_conformation: /home/liuy/data/SynBio/enzyme-reaction-pairs/training/toy/feature/reaction/molecule_conformation
+reaction_center: /home/liuy/data/SynBio/enzyme-reaction-pairs/training/toy/feature/reaction/reacting_center/reacting_center.pkl

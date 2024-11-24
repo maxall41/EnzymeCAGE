@@ -1,0 +1,53 @@
+gpu: 0
+data_version: 'V12'
+recall_method: 'selenzyme'
+
+rxn_feat: 'drfp'
+# rxn_feat: 'morgan_fp'
+model: 'gvp-schnet'
+
+predict_dis_pair: False
+interaction_method: 'cross-attention'
+pair_repr_type: 'distance_map'
+
+msa_feature: False
+do_coevo_attn: False
+
+data_split_by: 'all'
+
+data_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/dataset/baseline/V12/'
+
+use_prods_info: False
+use_structure: True
+use_drfp: True
+use_esm: True
+
+batch_size: 512
+predict_mode: 'only_best'
+label_column_name: 'Label'
+
+auto_load_data: False
+
+# data_path: '/home/liuy/code/SynBio/enzyme-rxn-prediction/dataset/recruit_infer/V11/new_rxns/infer_optim.csv'
+# data_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v12.3/new-enzymes/test.csv'
+# data_path: '/home/liuy/data/SynBio/Cooperation/jingke/data_to_predict.csv'
+data_path: '/home/liuy/data/SynBio/P450/P450Rdb/test_P450.csv'
+
+ckpt_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/checkpoints/V12.3/new-enzymes/cross-attn'
+
+
+### general feature path 
+# gvp_feature: '/home/liuy/data/SynBio/enzyme-reaction-pairs/feature/gvp_torchdrug_feature/protein_pocket_8A_new.pt'
+# rxn_feature: '/home/liuy/data/SynBio/enzyme-reaction-pairs/feature'
+# esm_mean_feature: '/home/liuy/data/SynBio/enzyme-reaction-pairs/feature/esm2_t33_650M_UR50D/protein_level/seq2feature.pkl'
+# esm_node_feature: '/home/liuy/data/SynBio/enzyme-reaction-pairs/feature/esm2_t33_650M_UR50D/node_level/esm_pocket_node_feature.pt'
+# mol_conformation: '/home/liuy/data/SynBio/enzyme-reaction-pairs/others/molecule_conformation/sdf'
+
+### specified feature path
+gvp_feature: '/home/liuy/data/SynBio/P450/P450Rdb/feature/protein/gvp_feature/protein_full.pt'
+rxn_feature: '/home/liuy/data/SynBio/P450/P450Rdb/feature/reaction/'
+esm_mean_feature: '/home/liuy/data/SynBio/P450/P450Rdb/feature/protein/esm2_t33_650M_UR50D/protein_level/seq2feature.pkl'
+esm_node_feature: '/home/liuy/data/SynBio/P450/P450Rdb/feature/protein/esm2_t33_650M_UR50D/pocket_node_feature/feature.pt'
+mol_conformation: '/home/liuy/data/SynBio/P450/P450Rdb/feature/reaction/molecule_conformation'
+
+
