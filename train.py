@@ -2,8 +2,6 @@ import os
 import json
 import argparse
 import yaml
-from copy import deepcopy
-
 
 from tqdm import tqdm
 import torch
@@ -54,6 +52,7 @@ def main(model_conf):
             use_prods_info=model_conf.use_prods_info,
             interaction_method=model_conf.interaction_method,
             rxn_inner_interaction=model_conf.rxn_inner_interaction,
+            pocket_inner_interaction=model_conf.pocket_inner_interaction,
             device=device
         )
         
@@ -90,6 +89,7 @@ def main(model_conf):
     else:
         raise ValueError('model type is not supported: {model_conf.model}')
 
+    
     test_loader = DataLoader(test_set, batch_size=model_conf.batch_size, shuffle=False, follow_batch=follow_batch)
     valid_loader = DataLoader(valid_set, batch_size=model_conf.batch_size, shuffle=False, follow_batch=follow_batch)
     train_loader = DataLoader(train_set, batch_size=model_conf.batch_size, shuffle=True, follow_batch=follow_batch, drop_last=True)
@@ -102,11 +102,6 @@ def main(model_conf):
     loss_func = nn.BCEWithLogitsLoss()
         
     os.makedirs(model_conf.ckpt_dir, exist_ok=True)
-
-    if model_conf.use_gradient_accumulation:
-        accumulation_steps = get_accumulation_steps(model_conf.batch_size)
-    else:
-        accumulation_steps = 1
     
     best_metric = 0
     for epoch in range(model_conf.num_epochs):
@@ -120,24 +115,21 @@ def main(model_conf):
         for i, batch in enumerate(tqdm(train_loader)):
             batch.epoch = epoch
             target = batch.y.to(device)
-            batch.to(device, non_blocking=True)
+            batch.to(device)
 
             pred = model(batch)
             binary_loss = loss_func(pred, target)
             loss = binary_loss
             
-            loss = loss / accumulation_steps
-            loss.backward()
-            
-            if ((i + 1) % accumulation_steps == 0) or (i + 1 == len(train_loader)):
-                optimizer.step()
-                optimizer.zero_grad()
+            loss.backward()            
+            optimizer.step()
+            optimizer.zero_grad()
             
             binary_loss_sum += binary_loss.item()
             target_list.append(target.detach())
             pred_list.append(pred.detach())
             all_rxns.extend(batch.rxn)
-            
+        
         torch.save(model.state_dict(), os.path.join(model_conf.ckpt_dir, "epoch_%d.pth" % epoch))
 
         lr = optimizer.state_dict()['param_groups'][0]['lr']
@@ -146,8 +138,11 @@ def main(model_conf):
         
         target_list = torch.concat(target_list)
         pred_list = torch.concat(pred_list)
+        
         if not model.sigmoid_readout:
             pred_list = torch.sigmoid(pred_list)
+            
+        print(f"\n {pred_list[0]} \n")
             
         train_metric = model.calc_metric(pred_list, target_list, all_rxns)
         for k, v in train_metric.items():
@@ -204,30 +199,23 @@ def main(model_conf):
     df_valid = valid_set.df_data
     df_valid['pred'] = valid_preds.cpu()
     df_valid.to_csv(os.path.join(model_conf.ckpt_dir, f"valid_result.csv"), index=False)
-
+    
+    print()
+    print(df_valid.loc[0, 'pred'])
+    print()
 
 
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, required=True)
-    parser.add_argument('--run_multiple_times', action='store_true')
     args = parser.parse_args()
     
     assert os.path.exists(args.config)
-
     model_conf = Config(args.config)
     
-    if not args.run_multiple_times:
-        seed = 42 if not hasattr(model_conf, 'seed') else model_conf.seed
-        seed_everything(seed)
-        backup_config(args.config)
-        main(model_conf)
-    else:
-        main_ckpt_dir = deepcopy(model_conf.ckpt_dir)
-        seeds = range(40, 45)
-        for seed in tqdm(seeds, desc='Running multiple times'):
-            seed_everything(seed)
-            model_conf.ckpt_dir = os.path.join(main_ckpt_dir, f'seed_{seed}')
-            backup_config(args.config, model_conf.ckpt_dir)
-            main(model_conf)
+    seed = 42 if not hasattr(model_conf, 'seed') else model_conf.seed
+    seed_everything(seed)
+    backup_config(args.config)
+    main(model_conf)
+    

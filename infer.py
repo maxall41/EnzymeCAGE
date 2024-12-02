@@ -31,8 +31,8 @@ def inference(model_conf):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     
     if model_conf.model == 'EnzymeCAGE':
-        follow_batch = ['protein', 'reaction_feature', 'esm_feature', 'substrates', 'products']
         
+        follow_batch = ['protein', 'reaction_feature', 'esm_feature', 'substrates', 'products']
         model = EnzymeCAGE(
             use_esm=model_conf.use_esm,
             use_structure=model_conf.use_structure,
@@ -40,11 +40,10 @@ def inference(model_conf):
             use_prods_info=model_conf.use_prods_info,
             interaction_method=model_conf.interaction_method,
             rxn_inner_interaction=model_conf.rxn_inner_interaction,
+            pocket_inner_interaction=model_conf.pocket_inner_interaction,
             device=device
         )
-        
-        print('Model save dir: ', model_conf.ckpt_dir)
-        
+                
         protein_gvp_feat = torch.load(model_conf.protein_gvp_feat)
         esm_node_feature = torch.load(model_conf.esm_node_feature)
         
@@ -58,27 +57,13 @@ def inference(model_conf):
 
     
     elif model_conf.model == 'baseline':
-        
         follow_batch = ['reaction_feature', 'esm_feature']
-        model = Baseline(device=device)
-
-        # model = Baseline(device=device)
-        model_conf.ckpt_dir = model_conf.ckpt_dir
-        print('Model save dir: ', model_conf.ckpt_dir)
-        
+        model = Baseline(device=device)        
         infer_dataset = load_baseline_dataset(model_conf.data_path, model_conf.rxn_fp, model_conf.esm_mean_feature)
 
     
     df_data = pd.read_csv(model_conf.data_path)
-    # if 'uniprotID' not in df_data.columns and 'enzyme' in df_data.columns:
-    #     df_data['uniprotID'] = df_data['enzyme']
-    # if 'CANO_RXN_SMILES' not in df_data.columns and 'reaction' in df_data.columns:
-    #     df_data['CANO_RXN_SMILES'] = df_data['reaction']
-    # if 'sequence' not in df_data.columns:
-    #     df_data['sequence'] = df_data['uniprotID'].map(UNIPROT_TO_SEQ)
-    #     df_data = df_data[df_data['sequence'].notna()]
 
-    # 只是为了不报错，实际上不会用到
     if 'Label' not in df_data.columns:
         df_data['Label'] = 0
     
@@ -111,7 +96,6 @@ def inference(model_conf):
         print('Start inference...')
         model.eval()
         preds, _ = model.evaluate(test_loader, show_progress=True)
-        print(f'preds.shape: {preds.shape}')
         df_data['pred'] = preds.cpu()
         df_data.to_csv(save_path, index=False)
         print('Save pred result to: ', save_path)

@@ -19,28 +19,35 @@ def get_dis_pair(coords, bin_size=2, bin_min=-1, bin_max=30, num_classes=16):
 
 
 def calculate_pocket_weights(enzyme_coords_batch, enzyme_coords_mask):
-    # Calculate geometric center
+    # 计算几何中心
+    # print(f"enzyme_coords_batch.shape: {enzyme_coords_batch.shape}, enzyme_coords_mask.shape: {enzyme_coords_mask.shape}")
     valid_coords = enzyme_coords_batch
     valid_counts = enzyme_coords_mask.sum(dim=1, keepdim=True).float()  # (bs, 1)
+
+    # 避免除以0的情况
     valid_counts[valid_counts == 0] = 1
+
+    # 计算几何中心坐标
     center_of_mass = valid_coords.sum(dim=1) / valid_counts  # (bs, 3)
 
-    # Calculate the distance of each amino acid to the geometric center
+    # 计算每个氨基酸到几何中心的距离
     distances = torch.norm(enzyme_coords_batch - center_of_mass.unsqueeze(1), dim=2)  # (bs, n_nodes)
 
-    # Calculate the weight of each amino acid based on its distance to the geometric center
-    # The weight is inversely proportional to the distance
+    # 计算权重（距离越小权重越大）
     max_distances, _ = torch.max(distances, dim=1, keepdim=True)  # (bs, 1)
     min_distances, _ = torch.min(distances, dim=1, keepdim=True)  # (bs, 1)
 
+    # 避免除以0
     distance_range = max_distances - min_distances
     distance_range[distance_range == 0] = 1
 
-    # Normalize the distances to a range of [0, 1]
+    # 归一化的距离
     normalized_distances = (distances - min_distances) / distance_range  # (bs, n_nodes)
 
-    # Calculate the weight (the smaller the weight, the farther the distance from the geometric center)
+    # 计算权重（权重越小表示距离几何中心越远），设置范围为[0.75, 1]
     pocket_weight = (1 - normalized_distances) / 5  # (bs, n_nodes)
+
+    # 对于无效氨基酸，权重设为0
     pocket_weight = pocket_weight * enzyme_coords_mask
 
     return pocket_weight
@@ -116,7 +123,8 @@ class EnzymeCAGE(BaseModel):
         use_drfp=True, 
         use_prods_info=True, 
         interaction_method='geo-enhanced-interaction',
-        rxn_inner_interaction=False,
+        rxn_inner_interaction=True,
+        pocket_inner_interaction=True,
         hidden_dims=[3840, 2048, 1024], 
         dropout=0.2, 
         sigmoid_readout=False,
@@ -129,6 +137,7 @@ class EnzymeCAGE(BaseModel):
         self.use_prods_info = use_prods_info
         self.interaction_method = interaction_method
         self.rxn_inner_interaction = rxn_inner_interaction
+        self.pocket_inner_interaction = pocket_inner_interaction
         self.embed_dim = 128
         self.pair_repr_dim = 32
         self.attention_output_dim = 128
@@ -137,7 +146,6 @@ class EnzymeCAGE(BaseModel):
         self.dis_onehot_class = 16
 
         in_feat_dim = 0
-        # protein feature
         if self.use_esm:
             in_feat_dim += 1280
         if self.use_structure:
@@ -159,10 +167,12 @@ class EnzymeCAGE(BaseModel):
 
         self.molecule_encoder = SchNet(hidden_channels=self.embed_dim).to(device)
         self.mol_repr_layer_norm = nn.LayerNorm(self.embed_dim)
-
+        
         self.gvp_encoder = GVP_embedding((6, 3), (self.embed_dim//2, 16), (32, 1), (32, 1), seq_in=False)
         self.enzyme_transform_layer = nn.Linear(1280+self.embed_dim, self.embed_dim)
         
+        self.pair_repr_linear = nn.Linear(self.dis_onehot_class, 32)
+
         if self.interaction_method == 'geo-enhanced-interaction':
             enz_node_dim = 1280 + self.embed_dim
             enzyme_attn_embed_dim = 512
@@ -238,7 +248,10 @@ class EnzymeCAGE(BaseModel):
                 p_coords_batched, p_coords_mask = to_dense_batch(data.node_xyz, data['protein'].batch)
                 _, protein_dis_pair = get_dis_pair(p_coords_batched, bin_size=2, bin_min=-1, bin_max=30, num_classes=self.dis_onehot_class)
                 
-                protein_attn_bias = 1 - protein_dis_pair / 30
+                if self.pocket_inner_interaction:
+                    protein_attn_bias = 1 - protein_dis_pair / 30
+                else:
+                    protein_attn_bias = None
                 enzyme_out_batched, _ = self.enzyme_attention(enzyme_out_batched, enzyme_out_batched, enzyme_out_mask, attn_bias=protein_attn_bias, return_weights=True)
                 
                 subs_reacting_center, subs_mask = to_dense_batch(data['substrates'].reacting_center, data['substrates'].batch)

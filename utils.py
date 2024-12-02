@@ -1,4 +1,5 @@
 import os
+import random
 
 import torch
 import numpy as np
@@ -98,11 +99,15 @@ def load_origin_data(model_conf):
 
 
 def seed_everything(seed=42):
+    random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    torch.set_num_threads(5)
+    torch.set_num_threads(5)    
+    
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 
 @numba.jit(nopython=True, parallel=True)
