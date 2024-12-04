@@ -1,60 +1,81 @@
-# Running config
+# EnzymeCAGE: A Geometric Foundation Model for Enzyme Retrieval with Evolutionary Insights
+
+![EnzymeCAGE](./image/EnzymeCAGE.jpg)
 
 ## Environment 
+```
+conda create -n enzymecage python=3.8
+
+pyyaml==6.0
+tqdm==4.66.2
+numpy==1.24.3
+pandas==1.4.2
+ase==3.22.1
+rdkit-pypi==2022.9.5
+pip install torch==2.1.0 torch-geometric==2.5.3 torch-scatter==2.1.2 torch-cluster==1.6.3 -f https://download.pytorch.org/whl/cu122/torch_stable.html
+
+```
+
+## Running
+* Download csv format dataset and alphafold2 structures of enzymes
+* Run AlphaFill to get the catalytic pocket
+* Prepare the feature of enzymes and reactions
+* Train the model, retrieve the candidate enzymes for reactions, do inference and ranking
+* Evaluate the performance of the model
+
+### Dataset
+First, download the dataset and extract it to the current directory.
+
+
+#### Option 1: Directly use the extracted pockets
+We have run AlphaFill and pre-extracted the enzyme pockets from the dataset, and you can directly use this part of the data to reproduce the experimental results. The pockets are located in `./dataset/pocket/alphafill_8A`
+
+Note: To improve the running speed of AlphaFill, we set the number of homologous proteins to query to 5 (the default is 200). The corresponding parameter is `--blast-report-limit=5`
+
+#### Option 2: Rerun AlphaFill to extract the pockets
+If you need to calculate features for model training or directly perform inference on your own dataset, you will need to run AlphaFill to extract the pockets yourself.
+
+**Step 1: Get the CIF format structure of enzymes**
+
+If your dataset only contains protein sequences, you will first need to obtain structural information (preferably in CIF format). You can either deploy [colabfold](https://github.com/YoshitakaMo/localcolabfold.git), locally or choose to [run it online](https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb)，
+
+**Step 2: Deploy AlphaFill**
+
+First, download the PDB-REDO database (this may take some time):
 ```shell
-conda activate /cluster/home/xiuming.li/miniconda3/envs/torchdrug
+cd dataset/PDB-REDO
+rsync -av --exclude=attic rsync://rsync.pdb-redo.eu/pdb-redo/ pdb-redo/
 ```
 
-## Configuration
-
-All config files are stored in folder `config/`, here is an example:
-```yaml
-gpu: 0 # GPU id
-
-# Which reaction fingerpring to use, two options: drfp or morgan_fp. morgan_fp is used for baseline.
-rxn_feat: 'drfp'
-
-# Main model structure, gvp for protein pocket encoder, schnet for substrate encoder.
-# Two options: gvp-schnet, gvp-painn
-model: 'gvp-schnet'
-
-# Interaction method, two options: cross-attention, pairformer
-interaction_method: 'cross-attention'
-
-# When interaction_method is cross-attention, batch_size can be 128(24G memory GPU) or 256(48G memory GPU)
-batch_size: 128
-
-# When interaction_method is pairformer, batch_size can only be 2(24G memory GPU) or 4(48G memory GPU)
-# batch_size: 4
-
-# Training data path. server ip: 123.6.102.203
-train_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v10/remove_no_ec/with_atom_limits/train.csv'
-valid_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v10/remove_no_ec/with_atom_limits/test.csv'
-test_path: '/home/liuy/data/SynBio/enzyme-reaction-pairs/training/v10/remove_no_ec/with_atom_limits/test.csv'
-
-## Training data on hpc server
-# train_path: '/cluster/home/xiuming.li/data/SynBio/enzyme-reaction-pairs/training/v10/remove_no_ec/with_atom_limits/train.csv'
-# valid_path: '/cluster/home/xiuming.li/data/SynBio/enzyme-reaction-pairs/training/v10/remove_no_ec/with_atom_limits/test.csv'
-# test_path: '/cluster/home/xiuming.li/data/SynBio/enzyme-reaction-pairs/training/v10/remove_no_ec/with_atom_limits/test.csv'
-
-# Checkpoint path. Remember to change the path to your own.
-ckpt_dir: '/home/liuy/code/SynBio/enzyme-rxn-prediction/checkpoints/V10/no_ec_rxns/esm_gvp-schnet_drfp_cross-attn_lr1e-4_decay-0.95'
-
-# No need to change these parameters
-data_version: 'V10'
-recall_method: 'selenzyme'
-data_split_by: 'all'
-auto_load_data: False
-data_dir: ''
-use_structure: True
-use_drfp: True
-use_esm: True
-label_column_name: 'Label'
-```
-
-## Runing
-Recommend to add `--debug` parameter to run first. In debug mode, only a small part of the training data will be loaded, which is much faster.
+Next, download the code and deploy AlphaFill:
 ```shell
-/cluster/home/xiuming.li/miniconda3/envs/torchdrug/bin/python main.py --mode train --config config_local/main.yaml --debug
+cd feature/pkgs
+git clone https://github.com/PDB-REDO/alphafill.git
+cp ../../scripts/run_alphafill ./alphafill
+cd alphafill
+```
+Then, follow the [tutorial](https://github.com/PDB-REDO/alphafill) to set up the environment.
+
+**Step 3: Run AlphaFill**
+
+After setup is complete, run the script `run_alphafill.py` to execute AlphaFill and extract the pockets:
+```shell
+python run_alphafill.py \
+    --input_dir {CIF_DIR} \ # Folder containing CIF files
+    --output_dir {OUT_DIR} \ # Output folder for extracted pockets
+    --pdb_fasta {FASTA_PATH} \ # Located in dataset/PDB-RED/pdbredo_seqdb.txt
+    --pdb_redo_dir {PDB_REDO_DIR} \ # Located in dataset/PDB-REDO/pdb-redo/
 ```
 
+
+
+### Feature
+
+
+### Training
+configuration
+
+
+### Inference
+reactions with candidate enzymes.
+only have candidate reactions.

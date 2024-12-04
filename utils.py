@@ -4,14 +4,9 @@ import random
 import torch
 import numpy as np
 import pandas as pd
-import numba
 from rdkit import Chem
 from rdkit.Chem.rdmolops import PatternFingerprint
 
-
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
-#DATA_DIR = '/public/home/team3/liuyong/data/SynBio/enzyme-reaction-pairs'
-DATA_DIR = '/home/liuy/data/SynBio/enzyme-reaction-pairs'
 
 def tranverse_folder(folder):
     all_files = []
@@ -110,35 +105,6 @@ def seed_everything(seed=42):
     torch.backends.cudnn.benchmark = False
 
 
-@numba.jit(nopython=True, parallel=True)
-def fast_cosine_matrix(u, M):
-    # 这里多次计算可能导致结果不一致
-    scores = np.zeros(M.shape[0])
-    for i in numba.prange(M.shape[0]):
-        v = M[i]
-        m = u.shape[0]
-        udotv = 0
-        u_norm = 0
-        v_norm = 0
-        for j in range(m):
-            if (np.isnan(u[j])) or (np.isnan(v[j])):
-                continue
-
-            udotv += u[j] * v[j]
-            u_norm += u[j] * u[j]
-            v_norm += v[j] * v[j]
-
-        u_norm = np.sqrt(u_norm)
-        v_norm = np.sqrt(v_norm)
-
-        if (u_norm == 0) or (v_norm == 0):
-            ratio = 0
-        else:
-            ratio = udotv / (u_norm * v_norm)
-        scores[i] = ratio
-    return scores
-
-
 def calc_rxn_center_fp(rxn_center):
     # rxn_center就是template
     prod_c = rxn_center.split('>>')[-1]
@@ -159,7 +125,6 @@ def remove_nan(data):
 
 
 def check_dir(path):
-    # 检查文件夹或者文件所在的文件夹是否存在
     folder = os.path.dirname(path) if '.' in path.split('/')[-1] else path
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -170,9 +135,3 @@ def get_substrate_from_rxn(rxn):
     rcts = rxn.split('>>')[0].split('.')
     rcts = sorted(rcts, key=lambda x: len(x), reverse=True)
     return rcts[0]
-
-
-def process_for_ESP(df, uniprot_to_seq):
-    df['Metabolites'] = df['reaction'].apply(lambda x: get_substrate_from_rxn(x))
-    df['Enzymes'] = df['enzyme'].apply(lambda x: uniprot_to_seq.get(x))
-    return df

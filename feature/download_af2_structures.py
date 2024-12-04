@@ -39,7 +39,7 @@ def download_alphafold_structure(uid, save_dir):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_path', type=str, required=True)
-    parser.add_argument('--uid_col', type=str, default='uniprotID')
+    parser.add_argument('--uid_col', type=str, default='uniprotID', help='The column name of Uniprot ID in the data file')
     parser.add_argument('--n_process', type=int, default=10)
     args = parser.parse_args()
     

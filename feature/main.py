@@ -415,9 +415,11 @@ def calc_reacting_center(data_path, save_dir, append=True):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_path', type=str, default='./dataset/testing/test.csv')
+    parser.add_argument('--alphafill_result_dir', type=str, default='./dataset/testing/alphafill_results')
     args = parser.parse_args()
     
-    alphafill_result_dir = os.path.join(os.path.dirname(args.data_path), 'alphafill_results')
+    # alphafill_result_dir = os.path.join(os.path.dirname(args.data_path), 'alphafill_results')
+    alphafill_result_dir = args.alphafill_result_dir
     if not os.path.exists(alphafill_result_dir):
         raise FileNotFoundError(f'alphafill result not found in {alphafill_result_dir}')
     
