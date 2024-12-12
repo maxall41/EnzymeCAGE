@@ -23,6 +23,7 @@ from extract_reacting_center import extract_reacting_center, calc_aam
 
 
 def calc_morgan_fp(data_path, save_path, append=True):
+    print('\n', '#' * 20, 'Calculating morgan fp', '#' * 20, '\n')
     df_data = pd.read_csv(data_path)
     rxn_list = list(set(df_data['CANO_RXN_SMILES']))
 
@@ -47,6 +48,7 @@ def calc_morgan_fp(data_path, save_path, append=True):
 
 
 def calc_drfp(data_path, save_path, append=True):
+    print('\n', '=' * 20, 'Calculating DRFP', '=' * 20, '\n')
     from drfp import DrfpEncoder
 
     df_data = pd.read_csv(data_path)
@@ -83,71 +85,35 @@ def batch_generator(sequence_list, batch_size):
         yield sequence_list[i:i + batch_size]
 
 
-def calc_long_seq_esm_feature(data_path, esm_node_feat_dir, esm_mean_feat_path):
+def calc_seq_esm_feature(data_path, esm_node_feat_dir, esm_mean_feat_path):
+    print('\n', '#' * 20, 'Calculating ESM feature', '#' * 20, '\n')
     # Load ESM-2 model
-    device = 'cuda:0'
-    # device = 'cpu'
+    device = 'cuda'
 
     print('Loading ESM-2 model...')
     model, alphabet = esm.pretrained.esm2_t33_650M_UR50D()
-    # model, alphabet = esm.pretrained.esm2_t30_150M_UR50D()
     batch_converter = alphabet.get_batch_converter()
     model = model.eval().to(device)
-    # model = model.eval()
     print('Molel loading done!')
-
-    # print(f"num_layers: {model.num_layers}")
-    # print(f"embed_dim: {model.embed_dim}")
-    # print(f"attention_heads: {model.attention_heads}")
-    # print(f"alphabet: {model.alphabet}")
-    # print(f"token_dropout: {model.token_dropout}")
-    # print(sss)
-
-    # data_path = '/mnt/nas/ai-algorithm-data/liuyong/dataset/SynBio/enzyme-reaction-pairs/from_zt/rxn2seq_clean_v2_no_ion.csv'
-    # data_path = '/home/liuy/data/SynBio/enzyme-reaction-pairs/feature/esm2_t33_650M_UR50D/node_level/bad_cases/missing_proteins.csv'
-    # data_path = '/home/liuy/data/SynBio/enzyme-reaction-pairs/overall/rxn2seq_clean_v2_no_ion.csv'
-    # save_dir = '/home/liuy/data/SynBio/enzyme-reaction-pairs/feature/esm2_t33_650M_UR50D/node_level/all'
-
-    # data_path = '/home/liuy/data/SynBio/Cooperation/jingke/data_to_predict.csv'
-    # save_dir = '/home/liuy/data/SynBio/Cooperation/jingke/feature/protein/esm2_t33_650M_UR50D/node_level'
-    
-    # data_path = '/home/liuy/data/SynBio/P450/P450Rdb/test_P450.csv'
-    # esm_node_feat_dir = '/home/liuy/data/SynBio/P450/P450Rdb/feature/protein/esm2_t33_650M_UR50D/node_level'
-    # esm_mean_feat_path = '/home/liuy/data/SynBio/P450/P450Rdb/feature/protein/esm2_t33_650M_UR50D/protein_level/seq2feature.pkl'
 
     df_data = pd.read_csv(data_path)
     uid_to_seq = dict(zip(df_data['uniprotID'], df_data['sequence']))
     os.makedirs(esm_node_feat_dir, exist_ok=True)
     os.makedirs(os.path.dirname(esm_mean_feat_path), exist_ok=True)
 
-    # 这样做是为了保序
+    # To ensure the order
     df_data = df_data.drop_duplicates('uniprotID')
-    # uid_list = df_data['uniprotID'].tolist()
 
     uid_list = []
     for uid in df_data['uniprotID'].tolist():
         seq = uid_to_seq.get(uid)
         save_path = os.path.join(esm_node_feat_dir, f'{uid}.npz')
 
-        # if not isinstance(uid, str) or not isinstance(seq, str) or len(seq) > 1000:
-        #     continue
+        # skip if already exists
         if os.path.exists(save_path):
             continue
         uid_list.append(uid)
     print(f"\n{len(uid_list)} proteins to calculate features...")
-
-    # if job_id == 0:
-    #     uid_list = uid_list[:len(uid_list)//2]
-    # elif job_id == 1:
-    #     uid_list = uid_list[len(uid_list)//2:]
-
-    # # seq_set = [seq for seq in seq_set if seq not in seq_to_feature and isinstance(seq, str) and len(seq) >= 800]
-    # seq_set = [seq for seq in seq_set if seq not in seq_to_feature and isinstance(seq, str)]
-    # seq_set = sorted(seq_set)
-    # if job_id == 0:
-    #     seq_set = seq_set[:len(seq_set)//2]
-    # elif job_id == 1:
-    #     seq_set = seq_set[len(seq_set)//2:]
 
     cnt_fail = 0
     cnt_all = 0
@@ -158,23 +124,15 @@ def calc_long_seq_esm_feature(data_path, esm_node_feat_dir, esm_mean_feat_path):
         seq_to_feature = pkl.load(open(esm_mean_feat_path, 'rb'))
     else:
         seq_to_feature = {}
-    # for uid, seq in tqdm(uid_to_seq.items()):
+
     for uid in tqdm(uid_list):
         seq = uid_to_seq.get(uid)
-
-        # if not isinstance(uid, str) or not isinstance(seq, str) or len(seq) > 1000:
-        #     continue
 
         save_path = os.path.join(esm_node_feat_dir, f'{uid}.npz')
         if os.path.exists(save_path):
             continue
         
-        # seq_cutoff = seq[:750]
-        # seq_cutoff = seq[:1000]
-        seq_cutoff = seq
-
-        input_data = [(f'seq{cnt_all}', seq_cutoff)]
-        # print(f'sequence length: {[len(each[1]) for each in input_data]}')
+        input_data = [(f'seq{cnt_all}', seq)]
         
         batch_labels, batch_strs, batch_tokens = batch_converter(input_data)
         batch_lens = (batch_tokens != alphabet.padding_idx).sum(1)
@@ -202,32 +160,21 @@ def calc_long_seq_esm_feature(data_path, esm_node_feat_dir, esm_mean_feat_path):
         np.savez_compressed(save_path, node_feature=node_feature)
         
         seq_to_feature[seq] = node_feature.mean(axis=0)
-
-        # for seq, feature in zip(batch, sequence_representations):
-        #     seq_to_feature[seq] = feature
-        # seq_to_feature[seq] = sequence_representations[0]
         
-        # torch.cuda.empty_cache()
-
-        # if cnt_all > 0 and cnt_all % 50000 == 0:
-        #     torch.save(seq_to_feature, save_path)
-        #     print(f'Save {i} batches sequence features to {save_path}')
-        
-        cnt_all += 1
-    
-    # torch.save(seq_to_feature, save_path)
-    
+        cnt_all += 1    
     
     with open(esm_mean_feat_path, 'wb') as f:
         pkl.dump(seq_to_feature, f)
 
-    # print(f'\ncnt_fail: {cnt_fail}, cnt_success: {len(seq_to_feature)-cnt_fail}')
     print(f'\ncnt_fail: {cnt_fail}')
     df_failed = pd.DataFrame({'uniprotID': failed_uids, 'sequence': failed_seqs})
-    df_failed.to_csv(os.path.join(esm_node_feat_dir, 'failed_proteins.csv'), index=False)
+    failed_save_path = os.path.join(esm_node_feat_dir, 'failed_proteins.csv')
+    df_failed.to_csv(failed_save_path, index=False)
+    print(f'Save failed proteins to {failed_save_path}')
 
 
 def generate_rdkit_conformation_v2(smiles, n_repeat=50):
+    
     try:
         mol = Chem.MolFromSmiles(smiles)
         # mol = Chem.RemoveAllHs(mol)
@@ -256,6 +203,7 @@ def generate_rdkit_conformation_v2(smiles, n_repeat=50):
 
 
 def generate_mol_conformation(data_path, save_dir):
+    print('\n', '#' * 20, 'Generating Mol Conformation', '#' * 20, '\n')
     df_data = pd.read_csv(data_path)
     rxns = set(df_data['CANO_RXN_SMILES'])
     
@@ -280,22 +228,6 @@ def generate_mol_conformation(data_path, save_dir):
         Chem.SDWriter(save_path).write(conformation)
 
 
-def get_seq_from_af2(uid):
-    three_to_one = {'ALA': 'A', 'CYS': 'C', 'ASP': 'D', 'GLU': 'E', 'PHE': 'F', 'GLY': 'G', 'HIS': 'H', 
-            'ILE': 'I', 'LYS': 'K', 'LEU': 'L', 'MET': 'M', 'ASN': 'N', 'PRO': 'P', 'GLN': 'Q', 
-            'ARG': 'R', 'SER': 'S', 'THR': 'T', 'VAL': 'V', 'TRP': 'W', 'TYR': 'Y'}
-
-    af2_dir = '/mnt/nas/ai-algorithm-data/liuyong/dataset/SynBio/enzyme-reaction-pairs/from_zt/3D-structures/alphafold_structures'
-    pdb_path = os.path.join(af2_dir, uid+'.pdb')
-    if not os.path.exists(pdb_path):
-        return None
-    
-    parser = PDBParser(QUIET=True)
-    structure = parser.get_structure('', pdb_path)
-    seq = "".join([three_to_one.get(res.resname) for res in structure.get_residues()])
-    return seq
-
-
 def get_pocket_info_batch(input_dir, save_path, pocket_save_dir=None, max_residue_num=None):
     filelist = [path for path in tranverse_folder(input_dir) if path.endswith('.cif')]
     uid_list = [os.path.basename(each).replace('_transplant.cif', '') for each in filelist]
@@ -312,6 +244,8 @@ def get_pocket_info_batch(input_dir, save_path, pocket_save_dir=None, max_residu
     df_pocket_info = pd.DataFrame({'uniprotID': uid_list, 'pocket_residues': pocket_info_list})
     df_pocket_info.to_csv(save_path, index=False)
     print(f'\nSave pocket info to {save_path}\n')
+    
+    delete_empty(pocket_save_dir)
 
 
 def get_esm_pocket_feature(pocket_info_path, esm_node_feat_dir, save_path):
@@ -344,18 +278,13 @@ def get_esm_pocket_feature(pocket_info_path, esm_node_feat_dir, save_path):
         
         uid_to_pocket_node_feature[uid] = pocket_node_feature
         
-    print(f'len(uid_to_pocket_node_feature): {len(uid_to_pocket_node_feature)}')
     torch.save(uid_to_pocket_node_feature, save_path)
     print(f'Save esm pocket feature to {save_path}\n')
 
 
 def check_pocket_feature(gvp_feature_path, esm_feature_path, log_dir=None):
-    # 确保node feature中node的个数是一样的
     gvp_feature = torch.load(gvp_feature_path)
     esm_feature = torch.load(esm_feature_path)
-    
-    print(f'len(gvp_feature): {len(gvp_feature)}')
-    print(f'len(esm_feature): {len(esm_feature)}')
     
     assert len(gvp_feature) == len(esm_feature)
     bad_proteins = []
@@ -383,6 +312,7 @@ def delete_empty(data_dir):
        
 
 def calc_reacting_center(data_path, save_dir, append=True):
+    print('\n', '#' * 20, 'Calculating Reaction Center', '#' * 20, '\n')
     
     calc_aam(data_path, save_dir, append)
     
@@ -416,6 +346,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_path', type=str, default='./dataset/testing/test.csv')
     parser.add_argument('--alphafill_result_dir', type=str, default='./dataset/testing/alphafill_results')
+    parser.add_argument('--pocket_dir', type=str, help='If you already have pocket data, you can specify the directory here')
+    parser.add_argument('--skip_calc_mol_conformation', action='store_true')
     args = parser.parse_args()
     
     # alphafill_result_dir = os.path.join(os.path.dirname(args.data_path), 'alphafill_results')
@@ -423,7 +355,11 @@ def main():
     if not os.path.exists(alphafill_result_dir):
         raise FileNotFoundError(f'alphafill result not found in {alphafill_result_dir}')
     
-    pocket_dir = os.path.join(os.path.dirname(args.data_path), 'pocket/alphafill_8A')
+    if not args.pocket_dir:
+        pocket_dir = os.path.join(os.path.dirname(args.data_path), 'pocket/alphafill_8A')
+    else:
+        pocket_dir = args.pocket_dir
+        
     feature_dir = os.path.join(os.path.dirname(args.data_path), 'feature')
     
     protein_feature_dir = os.path.join(feature_dir, 'protein')
@@ -439,7 +375,6 @@ def main():
     mol_conformation_dir = os.path.join(reaction_feat_dir, 'molecule_conformation')
     reacting_center_dir = os.path.join(reaction_feat_dir, 'reacting_center')
 
-    
     os.makedirs(pocket_dir, exist_ok=True)
     os.makedirs(esm_node_feat_dir, exist_ok=True)
     os.makedirs(os.path.dirname(esm_mean_feat_path), exist_ok=True)
@@ -450,19 +385,36 @@ def main():
     os.makedirs(mol_conformation_dir, exist_ok=True)
     os.makedirs(reacting_center_dir, exist_ok=True)
     
-    
+    # Calculate reaction fingerprints
     calc_morgan_fp(args.data_path, morgan_save_path)
     calc_drfp(args.data_path, drfp_save_path)
-    calc_reacting_center(args.data_path, reacting_center_dir)
-    # May be the most time consuming step
-    generate_mol_conformation(args.data_path, mol_conformation_dir)
     
-    calc_long_seq_esm_feature(args.data_path, esm_node_feat_dir, esm_mean_feat_path)
-    get_pocket_info_batch(alphafill_result_dir, pocket_info_save_path, pocket_dir)
-    delete_empty(pocket_dir)
+    # Extract reaction center
+    calc_reacting_center(args.data_path, reacting_center_dir)
+    
+    if not args.skip_calc_mol_conformation:
+        # May be the most time consuming step
+        # Generate molecular conformation by rdkit
+        generate_mol_conformation(args.data_path, mol_conformation_dir)
+    
+    # Calculate ESM features of the full sequence
+    calc_seq_esm_feature(args.data_path, esm_node_feat_dir, esm_mean_feat_path)
+    
+    # Extract pocket information if you don't specify the pocket directory
+    if not args.pocket_dir:
+        # Note: make sure the result file of alphafill ends with '_transplant.cif'
+        get_pocket_info_batch(alphafill_result_dir, pocket_info_save_path, pocket_dir)
+    
+    # Calculate GVP features of pockets
     calc_gvp_feature(args.data_path, pocket_dir, gvp_feat_path)
+    
+    # Extract esm feature of pocket nodes
     get_esm_pocket_feature(pocket_info_save_path, esm_node_feat_dir, esm_pocket_node_feature_path)
+    
+    # Make sure the number of nodes of pocket is the same between GVP and ESM feature
     check_pocket_feature(gvp_feat_path, esm_pocket_node_feature_path, log_dir=os.path.dirname(args.data_path))
+    
+    print('\n ###### Feature calculation is finished! ######\n')
     
 
 if __name__ == "__main__":

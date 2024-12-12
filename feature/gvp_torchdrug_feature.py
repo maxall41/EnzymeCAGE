@@ -85,6 +85,7 @@ def batch_run(x):
 
 
 def calc_gvp_feature(data_path, pdb_dir, save_path):
+    print('\n', '#' * 20, 'Calculating GVP Feature', '#' * 20, '\n')
     protein_embedding_folder = os.path.join(os.path.dirname(save_path), 'tmp')
     os.makedirs(protein_embedding_folder, exist_ok=True)
 
