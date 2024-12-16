@@ -30,7 +30,7 @@ pip install transformers==4.14.1
 * Evaluate the performance of the model
 
 ## Dataset
-First, download the dataset [here](https://zenodo.org/records/14499040) and extract it to the current directory.
+First, download the dataset and extract it to the current directory.
 
 ### Option 1: Directly use the extracted pockets
 We have run AlphaFill and pre-extracted the enzyme pockets from the dataset, and you can directly use this part of the data to reproduce the experimental results. The pockets are located in `./dataset/pocket/alphafill_8A`
@@ -128,8 +128,6 @@ python train --config config/train/unseen-enzymes.yaml
 # For test set Orphan-194
 python train --config config/train/orphan-reactions.yaml
 ```
-
-Pre-trained checkpoints are available [here](https://zenodo.org/records/14211913)
 
 
 ## Retrieve & Inference
