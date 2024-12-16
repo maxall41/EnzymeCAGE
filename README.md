@@ -129,6 +129,9 @@ python train --config config/train/unseen-enzymes.yaml
 python train --config config/train/orphan-reactions.yaml
 ```
 
+Pre-trained checkpoints are available [here](https://zenodo.org/records/14211913)
+
+
 ## Retrieve & Inference
 The evaluation processes for Loyal-1968 and Orphan-194 differ slightly. For the Loyal-1968 test set, candidate enzymes have already been assigned to each reaction, allowing us to directly use the trained model to predict the catalytic scores. In contrast, for the Orphan-194 test set, we must first retrieve candidate enzymes for each reaction before using the trained model to predict the catalytic scores.
 
