@@ -127,7 +127,7 @@ def get_mol_simi_dict(test_rxns, all_cand_rxns):
     return cpd_simi_dict, cand_mol_to_id_dict
 
 
-def run_recall(df_data, df_db, smiles_col, uid_to_proevi, uid_to_taxdis, topk=10):
+def run_retrieval(df_data, df_db, smiles_col, uid_to_proevi, uid_to_taxdis, topk=10):
     """To retrieve candidate enzymes for each reaction in the df_data.
 
     Args:
@@ -210,8 +210,10 @@ def main():
     uid_to_proevi = pkl.load(open(args.proevi_path, 'rb'))
     uid_to_taxdis = pkl.load(open(args.taxdis_path, 'rb'))
     
-    df_retrievel_cands = run_recall(df_data, df_db, args.smiles_col, uid_to_proevi, uid_to_taxdis)
+    df_retrievel_cands = run_retrieval(df_data, df_db, args.smiles_col, uid_to_proevi, uid_to_taxdis)
     df_retrievel_cands.to_csv(save_path, index=False)
+    
+    print(f'Retrieved candidates saved to: {save_path}')
 
 
 if __name__ == "__main__":

@@ -6,19 +6,19 @@
 ```
 conda create -n enzymecage python=3.8
 
-pyyaml==6.0
-tqdm==4.66.2
-numpy==1.24.3
-pandas==1.4.2
-ase==3.22.1
-rdkit-pypi==2022.9.5
-fair-esm==2.0.0
-biopython==1.83
-drfp==0.3.6
-mlcrate==0.2.0
-rxn-chem-utils==1.5.0
+pip install pyyaml==6.0
+pip install tqdm==4.66.2
+pip install numpy==1.24.3
+pip install pandas==1.4.2
+pip install ase==3.22.1
+pip install rdkit-pypi==2022.9.5
+pip install fair-esm==2.0.0
+pip install biopython==1.83
+pip install drfp==0.3.6
+pip install mlcrate==0.2.0
+pip install rxn-chem-utils==1.5.0
 pip install torch==2.1.0 torch-geometric==2.5.3 torch-scatter==2.1.2 torch-cluster==1.6.3 -f https://download.pytorch.org/whl/cu122/torch_stable.html
-transformers==4.14.1
+pip install transformers==4.14.1
 
 ```
 
@@ -30,8 +30,7 @@ transformers==4.14.1
 * Evaluate the performance of the model
 
 ## Dataset
-First, download the dataset and extract it to the current directory.
-
+First, download the dataset [here](https://zenodo.org/records/14499040) and extract it to the current directory.
 
 ### Option 1: Directly use the extracted pockets
 We have run AlphaFill and pre-extracted the enzyme pockets from the dataset, and you can directly use this part of the data to reproduce the experimental results. The pockets are located in `./dataset/pocket/alphafill_8A`
@@ -102,6 +101,7 @@ python main.py \
 
 Feature computation for full data(~1M pairs):
 ```shell
+
 cd feature
 python main.py \
     --data_path ../dataset/all_train_test.csv \
@@ -111,9 +111,44 @@ python main.py \
 
 
 ## Training
-configuration
+After preparing the feature files, you can proceed with model training. Below is an example for training on a toy dataset:
+```shell
+python train.py --config config/testing/train.yaml
+```
 
+Once the toy dataset runs successfully, you can train the model on the full dataset. Two distinct training datasets have been prepared for evaluation on the **Loyal-1968** and **Orphan-194** test sets, respectively.
 
-## Inference
-reactions with candidate enzymes.
-only have candidate reactions.
+**Note**: To comprehensively evaluate the model's performance in predicting enzyme functions for unseen enzymes and orphan reactions, we constructed two specific test sets—Loyal-1968 and Orphan-194—along with their corresponding training datasets.
+
+Training commands:
+```shell
+# For test set Loyal-1968 
+python train --config config/train/unseen-enzymes.yaml
+
+# For test set Orphan-194
+python train --config config/train/orphan-reactions.yaml
+```
+
+## Retrieve & Inference
+The evaluation processes for Loyal-1968 and Orphan-194 differ slightly. For the Loyal-1968 test set, candidate enzymes have already been assigned to each reaction, allowing us to directly use the trained model to predict the catalytic scores. In contrast, for the Orphan-194 test set, we must first retrieve candidate enzymes for each reaction before using the trained model to predict the catalytic scores.
+
+Retrieve candidate enzymes to orphan reactions:
+```shell
+python retrieve.py --data_path dataset/orphan-rxns/orphan_reactions.csv
+```
+
+Do inference on the retrieved candidate enzymes:
+```shell
+python infer.py --config config/infer/infer_orphan-rxns.yaml
+```
+
+## Evaluation
+
+Specify the score file after inference and evaluate the results:
+```shell
+# For test set Orphan-194
+python evaluate.py --result_path checkpoints/orphan-rxns/seed_42/orphan_reactions_retrievel_cands_best_model.csv
+
+# For test set Loyal-1968
+python evaluate.py --result_path checkpoints/unseen-enzymes/seed_42/test_result.csv
+```

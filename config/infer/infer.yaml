@@ -1,0 +1,21 @@
+model: 'EnzymeCAGE'
+interaction_method: 'geo-enhanced-interaction'
+rxn_inner_interaction: True
+pocket_inner_interaction: True
+use_prods_info: False
+use_structure: True
+use_drfp: True
+use_esm: True
+batch_size: 384
+predict_mode: 'only_best'
+
+data_path: /data/home/liuy/code/SynBio/EnzymeCAGE/dataset/orphan-194/test.csv
+ckpt_dir: /home/liuy/code/SynBio/EnzymeCAGE/checkpoints/V12.3/new-enzymes/EnzymeCAGE/seed_42
+
+### general feature path 
+rxn_fp: /home/liuy/data/SynBio/enzyme-reaction-pairs/feature/drfp/rxn2fp.pkl
+protein_gvp_feat: /home/liuy/data/SynBio/enzyme-reaction-pairs/feature/gvp_torchdrug_feature/protein_pocket_8A_new.pt
+esm_mean_feature: /home/liuy/data/SynBio/enzyme-reaction-pairs/feature/esm2_t33_650M_UR50D/protein_level/seq2feature.pkl
+esm_node_feature: /home/liuy/data/SynBio/enzyme-reaction-pairs/feature/esm2_t33_650M_UR50D/node_level/esm_pocket_node_feature.pt
+mol_conformation: /home/liuy/data/SynBio/enzyme-reaction-pairs/others/molecule_conformation/sdf
+reaction_center: /home/liuy/data/SynBio/enzyme-reaction-pairs/others/reacting_center/reacting_center.pkl
