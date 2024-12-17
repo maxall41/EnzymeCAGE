@@ -110,26 +110,6 @@ python main.py \
 ```
 
 
-## Training
-After preparing the feature files, you can proceed with model training. Below is an example for training on a toy dataset:
-```shell
-python train.py --config config/testing/train.yaml
-```
-
-Once the toy dataset runs successfully, you can train the model on the full dataset. Two distinct training datasets have been prepared for evaluation on the **Loyal-1968** and **Orphan-194** test sets, respectively.
-
-**Note**: To comprehensively evaluate the model's performance in predicting enzyme functions for unseen enzymes and orphan reactions, we constructed two specific test sets—Loyal-1968 and Orphan-194—along with their corresponding training datasets.
-
-Training commands:
-```shell
-# For test set Loyal-1968 
-python train --config config/train/unseen-enzymes.yaml
-
-# For test set Orphan-194
-python train --config config/train/orphan-reactions.yaml
-```
-
-
 ## Retrieve & Inference
 The evaluation processes for Loyal-1968 and Orphan-194 differ slightly. For the Loyal-1968 test set, candidate enzymes have already been assigned to each reaction, allowing us to directly use the trained model to predict the catalytic scores. In contrast, for the Orphan-194 test set, we must first retrieve candidate enzymes for each reaction before using the trained model to predict the catalytic scores.
 
