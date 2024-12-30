@@ -133,3 +133,15 @@ python evaluate.py --result_path checkpoints/orphan-rxns/seed_42/orphan_reaction
 # For test set Loyal-1968
 python evaluate.py --result_path checkpoints/unseen-enzymes/seed_42/test_result.csv
 ```
+
+## Citation
+Please cite the following preprint when referencing EnzymeCAGE:
+```
+@article{liu2024enzymecage,
+  title={EnzymeCAGE: A Geometric Foundation Model for Enzyme Retrieval with Evolutionary Insights},
+  author={Liu, Yong and Hua, Chenqing and Zeng, Tao and Rao, Jiahua and Zhang, Zhongyue and Wu, Ruibo and Coley, Connor W and Zheng, Shuangjia},
+  journal={bioRxiv},
+  year={2024},
+  publisher={Cold Spring Harbor Laboratory}
+}
+```
