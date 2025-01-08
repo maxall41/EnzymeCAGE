@@ -9,8 +9,8 @@ use_esm: True
 batch_size: 384
 predict_mode: 'only_best'
 
-data_path: dataset/orphan-rxns/orphan_reactions_retrievel_cands.csv
-ckpt_dir: checkpoints/orphan-rxns/seed_42
+data_path: dataset/unseen-enzymes/test.csv
+ckpt_dir: checkpoints/unseen-enzymes/seed_42
 
 ### general feature path 
 rxn_fp: dataset/feature/reaction/drfp/rxn2fp.pkl

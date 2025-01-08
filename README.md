@@ -30,7 +30,7 @@ pip install transformers==4.14.1
 * Evaluate the performance of the model
 
 ## Dataset
-First, download the dataset and extract it to the current directory.
+First, download the [dataset](https://zenodo.org/records/14613354) and extract it to the current directory.
 
 ### Option 1: Directly use the extracted pockets
 We have run AlphaFill and pre-extracted the enzyme pockets from the dataset, and you can directly use this part of the data to reproduce the experimental results. The pockets are located in `./dataset/pocket/alphafill_8A`
@@ -65,7 +65,7 @@ Then, follow the [tutorial](https://github.com/PDB-REDO/alphafill) to set up the
 
 After setup is complete, run the script `run_alphafill.py` to execute AlphaFill and extract the pockets:
 ```shell
-python run_alphafill.py \
+python scripts/run_alphafill.py \
     --input_dir {CIF_DIR} \ # Folder containing CIF files
     --output_dir {OUT_DIR} \ # Output folder for extracted pockets
     --pdb_fasta {FASTA_PATH} \ # Located in dataset/PDB-RED/pdbredo_seqdb.txt
