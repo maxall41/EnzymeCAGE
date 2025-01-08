@@ -111,7 +111,7 @@ python main.py \
 
 
 ## Retrieve & Inference
-The evaluation processes for Loyal-1968 and Orphan-194 differ slightly. For the Loyal-1968 test set, candidate enzymes have already been assigned to each reaction, allowing us to directly use the trained model to predict the catalytic scores. In contrast, for the Orphan-194 test set, we must first retrieve candidate enzymes for each reaction before using the trained model to predict the catalytic scores.
+The evaluation processes for Loyal-1968 and Orphan-194 differ slightly. For the Loyal-1968 test set, candidate enzymes have already been assigned to each reaction, allowing us to directly use the trained model to predict the catalytic scores. In contrast, for the Orphan-194 test set, we must first retrieve candidate enzymes for each reaction before using the trained model to predict the catalytic scores. Pretrained models are [here](https://zenodo.org/records/14613420).
 
 Retrieve candidate enzymes to orphan reactions:
 ```shell
