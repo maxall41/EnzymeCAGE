@@ -15,6 +15,9 @@ from utils import get_rdkit_mol
 
 
 def init_mapping_info(df_pos_pairs):
+    if 'Label' in df_pos_pairs.columns:
+        df_pos_pairs = df_pos_pairs[df_pos_pairs['Label'] == 1]
+        
     uid_to_seq = {}
     rxn_to_uid = defaultdict(set)
     for rxn, uid, seq in df_pos_pairs[['CANO_RXN_SMILES', 'uniprotID', 'sequence']].values:
