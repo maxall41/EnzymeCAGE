@@ -133,9 +133,12 @@ def cal_all_ef(df_score, label_col='Label', score_col='pred', topk=None, top_per
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--result_path', type=str, required=True)
-    parser.add_argument('--pos_pair_db_path', type=str, default='./dataset/positive_pairs/enzyme-reaction-pairs.csv')
+    parser.add_argument('--pos_pair_db_path', type=str, default=None)
     args = parser.parse_args()
     
+    if not args.pos_pair_db_path:
+        args.pos_pair_db_path = args.result_path
+        
     assert os.path.exists(args.result_path), f'result path not exists: {args.result_path}'
     assert os.path.exists(args.pos_pair_db_path), f'positive pair db path not exists: {args.pos_pair_db_path}'
     df_pred = pd.read_csv(args.result_path)
