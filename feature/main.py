@@ -4,7 +4,7 @@ import sys
 import pickle as pkl
 from multiprocessing import Pool
 from functools import partial
-sys.path.append('../')
+sys.path.append('/workspace/EnzyOptBenchmark/EnzymeCAGE')
 sys.path.append('./pkgs/')
 
 from rdkit import Chem
