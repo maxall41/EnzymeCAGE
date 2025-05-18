@@ -16,7 +16,7 @@ import torch
 import esm
 from Bio.PDB import PDBParser
 
-from ..utils import check_dir, cano_rxn, tranverse_folder
+from utils import check_dir, cano_rxn, tranverse_folder
 
 from gvp_torchdrug_feature import calc_gvp_feature
 
